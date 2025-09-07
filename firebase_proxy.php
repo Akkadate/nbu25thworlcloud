@@ -128,7 +128,9 @@ function sanitizeInput($input, $type = 'text') {
             $input = strip_tags($input);
             $input = htmlspecialchars($input, ENT_QUOTES | ENT_HTML5, 'UTF-8');
             // อนุญาตเฉพาะตัวอักษร ตัวเลข ช่องว่าง และเครื่องหมายพื้นฐาน
-            $input = preg_replace('/[^\p{L}\p{N}\s\-_\.]/u', '', $input);
+        // เปลี่ยนเป็นนี้ - รองรับภาษาไทยครบถ้วน
+        $input = preg_replace('/[^\u0E00-\u0E7Fa-zA-Z0-9\s\-_\.]/u', '', $input);   
+        // $input = preg_replace('/[^\p{L}\p{N}\s\-_\.]/u', '', $input);
             break;
             
         case 'id':
