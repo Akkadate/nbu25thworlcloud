@@ -348,15 +348,33 @@ try {
             $result = makeFirebaseRequest($url);
             
             $testCaptcha = validateCaptcha(8, '8');
-            $testThaiName = sanitizeInput('สุธิพงษ์ ทดสอบ', 'name');
+            
+            // ทดสอบชื่อไทยหลายแบบ
+            $thaiNames = [
+                'สุธิพงษ์',
+                'นางสาวสุธิดา',
+                'กิตติพงษ์ แสงไทย',
+                'วิภาวดี รุ่งเรื่อง',
+                'ธีรพัฒน์ เจริญกิจ'
+            ];
+            
+            $testResults = [];
+            foreach ($thaiNames as $name) {
+                $sanitized = sanitizeInput($name, 'name');
+                $testResults[] = [
+                    'original' => $name,
+                    'sanitized' => $sanitized,
+                    'same' => ($name === $sanitized)
+                ];
+            }
 
             $response = [
                 'success' => true,
-                'message' => 'All systems operational',
+                'message' => 'All systems operational with Thai name testing',
                 'tests' => [
                     'firebase_connection' => 'OK',
                     'captcha_validation' => $testCaptcha ? 'PASS' : 'FAIL',
-                    'thai_name_support' => $testThaiName,
+                    'thai_names_test' => $testResults,
                     'rate_limit_status' => checkRateLimit() ? 'OK' : 'EXCEEDED'
                 ],
                 'timestamp' => date('c'),
@@ -365,7 +383,7 @@ try {
                     'spam_detection' => true,
                     'profanity_filter' => true,
                     'captcha_validation' => true,
-                    'thai_names_support' => true,
+                    'thai_names_support' => 'Blacklist method (v2)',
                     'rate_limit_reset' => true
                 ]
             ];
