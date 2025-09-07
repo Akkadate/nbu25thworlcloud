@@ -383,7 +383,7 @@ try {
                     'spam_detection' => true,
                     'profanity_filter' => true,
                     'captcha_validation' => true,
-                    'thai_names_support' => 'Blacklist method (v2)',
+                    'thai_names_support' => 'No htmlspecialchars method (v3)',
                     'rate_limit_reset' => true
                 ]
             ];
