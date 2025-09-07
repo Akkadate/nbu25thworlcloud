@@ -1,7 +1,7 @@
 <?php
 /**
- * Firebase Proxy API - Fixed Rate Limiting
- * แก้ไขปัญหา Rate Limit และเพิ่ม Reset Function
+ * Firebase Proxy API - Complete Fixed Version
+ * แก้ไขปัญหาสระไทย + เพิ่ม Admin functions
  */
 
 // เปิด error reporting สำหรับ debug
@@ -36,7 +36,7 @@ function makeFirebaseRequest($url, $method = 'GET', $data = null) {
     curl_setopt($ch, CURLOPT_TIMEOUT, 30);
     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_USERAGENT, 'Firebase-Proxy-Fixed/1.0');
+    curl_setopt($ch, CURLOPT_USERAGENT, 'Firebase-Proxy-Complete/1.0');
     
     if ($method === 'POST' && $data !== null) {
         curl_setopt($ch, CURLOPT_POST, true);
@@ -84,7 +84,7 @@ function validateCaptcha($correctAnswer, $userAnswer) {
 }
 
 /**
- * Sanitize input - ใช้ \p{L} เพื่อรองรับทุกภาษา
+ * Sanitize input - แก้ไขปัญหาสระไทยหาย (FINAL VERSION)
  */
 function sanitizeInput($input, $type = 'text') {
     if (empty($input)) {
@@ -95,15 +95,37 @@ function sanitizeInput($input, $type = 'text') {
     
     switch ($type) {
         case 'text':
+            // สำหรับข้อความ ใช้การป้องกันปกติ
             $input = strip_tags($input);
             $input = htmlspecialchars($input, ENT_QUOTES | ENT_HTML5, 'UTF-8');
             break;
             
         case 'name':
+            // 🔥 สำหรับชื่อ - ไม่ใช้ htmlspecialchars เพราะจะทำให้สระไทยหาย
             $input = strip_tags($input);
-            $input = htmlspecialchars($input, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-            // ใช้ \p{L} เพื่อรองรับทุกภาษา (รวมไทย)
-            $input = preg_replace('/[^\p{L}\p{N}\s\-_\.]/u', '', $input);
+            
+            // กรองเฉพาะอักขระที่อันตรายจริงๆ สำหรับ database
+            $dangerousPatterns = [
+                '/<script.*?\/script>/is',
+                '/<iframe.*?\/iframe>/is',
+                '/javascript:/i',
+                '/vbscript:/i',
+                '/onload=/i',
+                '/onclick=/i',
+                '/onerror=/i',
+                '/data:/i',
+                '/eval\(/i',
+                '/alert\(/i'
+            ];
+            
+            // กรองด้วย regex patterns
+            foreach ($dangerousPatterns as $pattern) {
+                $input = preg_replace($pattern, '', $input);
+            }
+            
+            // กรองเครื่องหมายเฉพาะตัวที่อันตราย
+            $input = str_replace(['<', '>', '"', '\\', '|', ';'], '', $input);
+            
             break;
             
         case 'id':
@@ -125,7 +147,7 @@ function checkRateLimit($reset = false) {
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
     $now = time();
     $window = 3600; // 1 ชั่วโมง
-    $limit = 50;    // เพิ่มเป็น 50 ข้อความต่อชั่วโมง
+    $limit = 50;    // 50 ข้อความต่อชั่วโมง
     
     $rateLimitFile = sys_get_temp_dir() . '/rate_limit_' . md5($ip) . '.json';
     
@@ -218,7 +240,7 @@ $action = $_GET['action'] ?? ($_POST['action'] ?? 'get');
 try {
     switch ($action) {
         case 'reset_rate_limit':
-            // ฟังก์ชันใหม่: รีเซ็ต rate limit
+            // รีเซ็ต rate limit
             checkRateLimit(true);
             logEvent('rate_limit_reset');
             
@@ -257,6 +279,30 @@ try {
                 'success' => true,
                 'messages' => $messages,
                 'total' => count($messages),
+                'timestamp' => date('c')
+            ];
+            break;
+
+        case 'delete':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                throw new Exception('POST method required');
+            }
+
+            $id = sanitizeInput($_POST['id'] ?? '', 'id');
+            if (empty($id)) {
+                throw new Exception('Message ID is required');
+            }
+
+            // ลบจาก Firebase
+            $url = $FIREBASE_URL . "/wishes/{$id}.json";
+            $result = makeFirebaseRequest($url, 'DELETE');
+
+            logEvent('message_deleted', ['id' => $id]);
+
+            $response = [
+                'success' => true,
+                'message' => 'Message deleted successfully',
+                'id' => $id,
                 'timestamp' => date('c')
             ];
             break;
@@ -370,7 +416,7 @@ try {
 
             $response = [
                 'success' => true,
-                'message' => 'All systems operational with Thai name testing',
+                'message' => 'All systems operational - Thai names FIXED!',
                 'tests' => [
                     'firebase_connection' => 'OK',
                     'captcha_validation' => $testCaptcha ? 'PASS' : 'FAIL',
@@ -383,14 +429,49 @@ try {
                     'spam_detection' => true,
                     'profanity_filter' => true,
                     'captcha_validation' => true,
-                    'thai_names_support' => 'No htmlspecialchars method (v3)',
+                    'thai_names_support' => 'FIXED - No htmlspecialchars for names',
+                    'admin_delete' => true,
                     'rate_limit_reset' => true
                 ]
             ];
             break;
 
+        case 'stats':
+            // สถิติรวม
+            $url = $FIREBASE_URL . '/wishes.json';
+            $result = makeFirebaseRequest($url);
+            $data = json_decode($result, true);
+
+            $totalMessages = $data ? count($data) : 0;
+            $captchaVerified = 0;
+
+            $uniqueIPs = [];
+            if ($data) {
+                foreach ($data as $message) {
+                    $ip = $message['ip'] ?? 'unknown';
+                    $uniqueIPs[$ip] = true;
+                    
+                    if (isset($message['captcha_verified']) && $message['captcha_verified']) {
+                        $captchaVerified++;
+                    }
+                }
+            }
+
+            $response = [
+                'success' => true,
+                'stats' => [
+                    'total_messages' => $totalMessages,
+                    'captcha_verified' => $captchaVerified,
+                    'unique_users' => count($uniqueIPs),
+                    'verification_rate' => $totalMessages > 0 ? round(($captchaVerified / $totalMessages) * 100, 2) : 0,
+                    'last_updated' => date('c')
+                ],
+                'timestamp' => date('c')
+            ];
+            break;
+
         default:
-            throw new Exception('Invalid action. Available: get, add, test, reset_rate_limit');
+            throw new Exception('Invalid action. Available: get, add, delete, test, stats, reset_rate_limit');
     }
 
     echo json_encode($response, JSON_UNESCAPED_UNICODE);
@@ -408,8 +489,11 @@ try {
         'debug' => [
             'php_version' => phpversion(),
             'method' => $_SERVER['REQUEST_METHOD'],
-            'captcha_enabled' => true,
-            'rate_limit_increased' => true
+            'features' => [
+                'captcha_enabled' => true,
+                'thai_names_fixed' => true,
+                'admin_functions' => true
+            ]
         ]
     ];
 
