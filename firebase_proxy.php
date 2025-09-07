@@ -173,7 +173,7 @@ function checkRateLimit() {
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
     $now = time();
     $window = 3600; // 1 ชั่วโมง
-    $limit = 10;    // 10 ข้อความต่อชั่วโมง ต่อ IP
+    $limit = 20;    // 10 ข้อความต่อชั่วโมง ต่อ IP
     
     $rateLimitFile = sys_get_temp_dir() . '/rate_limit_' . md5($ip) . '.json';
     
