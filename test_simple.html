@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head><title>Test</title></head>
+<body>
+    <button onclick="testAPI()">Test API</button>
+    <div id="result"></div>
+    
+    <script>
+        const API_URL = 'https://nbu25th.northbkk.ac.th/firebase_proxy.php';
+        
+        async function testAPI() {
+            console.log('API URL:', API_URL);
+            
+            try {
+                const response = await fetch(API_URL + '?action=get');
+                const data = await response.json();
+                document.getElementById('result').innerHTML = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('result').innerHTML = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

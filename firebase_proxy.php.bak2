@@ -1,0 +1,326 @@
+<?php
+/**
+ * Firebase Proxy API
+ * ไฟล์: firebase_proxy.php
+ * 
+ * ทำหน้าที่เป็นตัวกลางระหว่าง JavaScript กับ Firebase
+ * เพื่อหลีกเลี่ยงปัญหา CSP (Content Security Policy)
+ */
+
+header('Content-Type: application/json; charset=utf-8');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
+// ⚠️ แทนที่ด้วย Firebase Database URL ของคุณ
+$FIREBASE_URL = 'https://nbu25th-default-rtdb.asia-southeast1.firebasedatabase.app';
+
+/**
+ * ฟังก์ชันทำ HTTP Request ไปยัง Firebase
+ */
+function makeFirebaseRequest($url, $method = 'GET', $data = null) {
+    // ลองใช้ cURL ก่อน (วิธีที่ปลอดภัยกว่า)
+    if (function_exists('curl_init')) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // สำหรับ development
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Firebase-Proxy/1.0');
+        
+        if ($method === 'POST' && $data !== null) {
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen(json_encode($data))
+            ]);
+        } else if ($method === 'DELETE') {
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+        }
+        
+        $result = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+        
+        if ($result === false) {
+            throw new Exception('cURL Error: ' . $error);
+        }
+        
+        if ($httpCode >= 400) {
+            throw new Exception('HTTP Error: ' . $httpCode);
+        }
+        
+        return $result;
+    }
+    
+    // ถ้าไม่มี cURL ให้ลอง file_get_contents
+    if (function_exists('file_get_contents')) {
+        $options = [
+            'http' => [
+                'method' => $method,
+                'header' => [
+                    'Content-Type: application/json',
+                    'User-Agent: Firebase-Proxy/1.0'
+                ],
+                'timeout' => 30
+            ]
+        ];
+        
+        if ($data !== null && $method === 'POST') {
+            $options['http']['content'] = json_encode($data);
+        }
+        
+        $context = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+        
+        if ($result === false) {
+            throw new Exception('Failed to connect to Firebase via file_get_contents');
+        }
+        
+        return $result;
+    }
+    
+    throw new Exception('No HTTP client available (cURL or file_get_contents)');
+}
+
+/**
+ * ฟังก์ชัน sanitize input
+ */
+function sanitizeInput($input) {
+    return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
+}
+
+/**
+ * ฟังก์ชันตรวจสอบ Rate Limiting
+ */
+function checkRateLimit() {
+    session_start();
+    
+    $now = time();
+    $window = 3600; // 1 ชั่วโมง
+    $limit = 20;    // 10 ข้อความต่อชั่วโมง
+    
+    if (!isset($_SESSION['rate_limit'])) {
+        $_SESSION['rate_limit'] = [];
+    }
+    
+    // ลบ timestamp เก่า
+    $_SESSION['rate_limit'] = array_filter($_SESSION['rate_limit'], function($timestamp) use ($now, $window) {
+        return ($now - $timestamp) < $window;
+    });
+    
+    // ตรวจสอบจำนวน
+    if (count($_SESSION['rate_limit']) >= $limit) {
+        return false;
+    }
+    
+    // เพิ่ม timestamp ใหม่
+    $_SESSION['rate_limit'][] = $now;
+    
+    return true;
+}
+
+$action = $_GET['action'] ?? ($_POST['action'] ?? 'get');
+
+try {
+    switch ($action) {
+        case 'get':
+            // อ่านข้อความทั้งหมด
+            $url = $FIREBASE_URL . '/wishes.json';
+            $result = makeFirebaseRequest($url);
+            $data = json_decode($result, true);
+            
+            // แปลง Firebase object เป็น array
+            $messages = [];
+            if ($data && is_array($data)) {
+                foreach ($data as $key => $value) {
+                    // ตรวจสอบว่าข้อมูลสมบูรณ์
+                    if (is_array($value) && 
+                        isset($value['message']) && 
+                        !empty($value['message']) &&
+                        is_string($value['message'])) {
+                        
+                        $messages[] = [
+                            'id' => $key,
+                            'name' => isset($value['name']) && is_string($value['name']) ? $value['name'] : 'ไม่ระบุชื่อ',
+                            'message' => $value['message'],
+                            'timestamp' => isset($value['timestamp']) ? $value['timestamp'] : date('c'),
+                            'ip' => 'hidden'
+                        ];
+                    }
+                }
+            }
+            
+            // เรียงลำดับตามเวลา
+            usort($messages, function($a, $b) {
+                return strtotime($b['timestamp']) - strtotime($a['timestamp']);
+            });
+            
+            $response = [
+                'success' => true,
+                'messages' => $messages,
+                'total' => count($messages),
+                'timestamp' => date('c'),
+                'storage' => 'firebase-proxy'
+            ];
+            
+            break;
+    
+        case 'delete':
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        throw new Exception('POST method required');
+    }
+    
+    $id = sanitizeInput($_POST['id'] ?? '');
+    if (empty($id)) {
+        throw new Exception('Message ID is required');
+    }
+    
+    // ลบจาก Firebase
+    $url = $FIREBASE_URL . "/wishes/{$id}.json";
+    $result = makeFirebaseRequest($url, 'DELETE');
+    
+    $response = [
+        'success' => true,
+        'message' => 'Message deleted successfully',
+        'id' => $id,
+        'timestamp' => date('c')
+    ];
+    break;
+        case 'add':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                throw new Exception('POST method required');
+            }
+            
+            // ตรวจสอบ Rate Limiting
+            if (!checkRateLimit()) {
+                throw new Exception('Rate limit exceeded. Please try again later.');
+            }
+            
+            $name = sanitizeInput($_POST['name'] ?? 'ไม่ระบุชื่อ');
+            $message = sanitizeInput($_POST['message'] ?? '');
+            
+            if (empty($message)) {
+                throw new Exception('Message is required');
+            }
+            
+            if (strlen($message) > 1000) {
+                throw new Exception('Message too long (max 500 characters)');
+            }
+            
+            if (strlen($name) > 50) {
+                throw new Exception('Name too long (max 50 characters)');
+            }
+            
+            // ตรวจสอบคำหยาบคาย
+            $badWords = ['ควย', 'หี', 'เย็ด', 'fuck', 'shit', 'damn'];
+            $messageCheck = strtolower($message . ' ' . $name);
+            
+            foreach ($badWords as $badWord) {
+                if (strpos($messageCheck, $badWord) !== false) {
+                    throw new Exception('Inappropriate content detected');
+                }
+            }
+            
+            // สร้างข้อมูลใหม่
+            $newMessage = [
+                'name' => $name,
+                'message' => $message,
+                'timestamp' => date('c'),
+                'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+            ];
+            
+            // ส่งไปยัง Firebase
+            $url = $FIREBASE_URL . '/wishes.json';
+            $result = makeFirebaseRequest($url, 'POST', $newMessage);
+            $firebaseResponse = json_decode($result, true);
+            
+            if (!$firebaseResponse || !isset($firebaseResponse['name'])) {
+                throw new Exception('Failed to save to Firebase');
+            }
+            
+            $response = [
+                'success' => true,
+                'message' => 'Message added successfully',
+                'id' => $firebaseResponse['name'],
+                'timestamp' => date('c')
+            ];
+            
+            break;
+            
+        case 'stats':
+            // อ่านสถิติ
+            $url = $FIREBASE_URL . '/wishes.json';
+            $result = makeFirebaseRequest($url);
+            $data = json_decode($result, true);
+            
+            $totalMessages = $data ? count($data) : 0;
+            
+            // นับจำนวน IP ที่ไม่ซ้ำ
+            $uniqueIPs = [];
+            if ($data) {
+                foreach ($data as $message) {
+                    $ip = $message['ip'] ?? 'unknown';
+                    $uniqueIPs[$ip] = true;
+                }
+            }
+            
+            $response = [
+                'success' => true,
+                'stats' => [
+                    'total_messages' => $totalMessages,
+                    'unique_users' => count($uniqueIPs),
+                    'last_updated' => date('c')
+                ],
+                'timestamp' => date('c')
+            ];
+            
+            break;
+            
+        case 'test':
+            // ทดสอบการเชื่อมต่อ Firebase
+            $url = $FIREBASE_URL . '/.json';
+            $result = makeFirebaseRequest($url);
+            
+            $response = [
+                'success' => true,
+                'message' => 'Firebase connection successful',
+                'firebase_url' => $FIREBASE_URL,
+                'response_length' => strlen($result),
+                'timestamp' => date('c')
+            ];
+            
+            break;
+            
+        default:
+            throw new Exception('Invalid action. Available: get, add, stats, test');
+    }
+    
+    echo json_encode($response, JSON_UNESCAPED_UNICODE);
+    
+} catch (Exception $e) {
+    http_response_code(500);
+    
+    $error = [
+        'success' => false,
+        'error' => $e->getMessage(),
+        'action' => $action,
+        'timestamp' => date('c'),
+        'debug' => [
+            'firebase_url' => $FIREBASE_URL,
+            'php_version' => phpversion(),
+            'method' => $_SERVER['REQUEST_METHOD']
+        ]
+    ];
+    
+    echo json_encode($error, JSON_UNESCAPED_UNICODE);
+}
+?>

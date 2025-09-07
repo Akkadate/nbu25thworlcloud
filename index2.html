@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ครบรอบ 25 ปี - คำอวยพรจากใจ</title>
+    <!-- เพิ่ม Google Fonts สำหรับ Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Prompt', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #0ea5e9 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(30, 58, 138, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23ffffff" opacity="0.1"><polygon points="0,100 100,0 200,50 300,0 400,30 500,0 600,50 700,20 800,0 900,40 1000,0 1000,100"/></svg>') repeat-x;
+            background-size: 1000px 100px;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+        }
+
+        .logo img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .logo-placeholder {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.3em;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .anniversary-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #fbbf24, #f59e0b);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+        }
+
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            gap: 30px;
+            padding: 30px;
+            min-height: calc(100vh - 200px);
+        }
+
+        .left-panel {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            height: fit-content;
+        }
+
+        .right-panel {
+            flex: 2;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-section h2 {
+            color: #1e3a8a;
+            margin-bottom: 25px;
+            font-size: 2em;
+            font-weight: 600;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .wordcloud-section h2 {
+            color: #1e3a8a;
+            margin-bottom: 25px;
+            font-size: 2em;
+            text-align: center;
+            font-weight: 600;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1e3a8a;
+            font-size: 16px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 15px 18px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Prompt', inherit;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            background: white;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #0ea5e9 100%);
+            color: white;
+            border: none;
+            padding: 18px 35px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 12px;
+            display: none;
+            font-weight: 500;
+        }
+
+        .error {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            color: #dc2626;
+            border: 2px solid #fca5a5;
+        }
+
+        .success {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            color: #16a34a;
+            border: 2px solid #86efac;
+        }
+
+        .wordcloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .word {
+            padding: 8px 15px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(14, 165, 233, 0.1) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: fadeInScale 0.6s ease-out;
+        }
+
+        .word:hover {
+            transform: scale(1.1) rotate(2deg);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(14, 165, 233, 0.2) 100%);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .stats {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            border-radius: 15px;
+            margin-top: 25px;
+            box-shadow: 0 8px 25px rgba(30, 58, 138, 0.3);
+        }
+
+        .stats-item {
+            display: inline-block;
+            margin: 0 20px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .stats-item strong {
+            display: block;
+            font-size: 28px;
+            margin-bottom: 5px;
+            color: #fbbf24;
+        }
+
+        .status {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            padding: 12px 20px;
+            border-radius: 25px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 1000;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .connected { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .disconnected { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+        .loading { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+
+        .empty-state {
+            text-align: center;
+            color: #64748b;
+            font-size: 18px;
+            padding: 60px 20px;
+        }
+
+        .empty-state .emoji {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        
+.wordcloud-controls {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.show-more-btn {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    margin: 0 5px;
+}
+
+.show-more-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+            
+            .logo {
+                height: 60px;
+                margin-right: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .header p {
+                font-size: 1.1em;
+            }
+            
+            .logo-container {
+                flex-direction: column;
+                margin-bottom: 15px;
+            }
+            
+            .logo {
+                margin-right: 0;
+                margin-bottom: 10px;
+                height: 75px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .left-panel, .right-panel {
+                padding: 25px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading-dots {
+            display: inline-block;
+        }
+
+        .loading-dots::after {
+            content: '...';
+            animation: loadingDots 2s infinite;
+        }
+
+        @keyframes loadingDots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+    </style>
+</head>
+<body>
+    <div class="status" id="status">🔄 กำลังโหลด<span class="loading-dots"></span></div>
+    
+    <div class="header">
+        <div class="logo-container">
+            <div class="logo">
+                <img src="https://img5.pic.in.th/file/secure-sv1/Logo-NBU-Solid-Color-Blue-and-White--04_0.th.png" alt="University Logo">
+            </div>
+            <div class="header-content">
+                <h1>🎉 ครบรอบ 25 ปี 🎉</h1>
+                <p>ส่งคำอวยพรและแบ่งปันความประทับใจของคุณ</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="left-panel">
+            <div class="form-section">
+                <h2>💌 เขียนคำอวยพร</h2>
+                
+                <div class="message error" id="errorMsg"></div>
+                <div class="message success" id="successMsg"></div>
+                
+                <form id="wishForm">
+                    <div class="form-group">
+                        <label for="name">ชื่อของคุณ (ไม่บังคับ)</label>
+                        <input type="text" id="name" maxlength="50" placeholder="ใส่ชื่อของคุณ...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">ข้อความอวยพร</label>
+                        <textarea id="message" required maxlength="500" placeholder="เขียนคำอวยพรสำหรับมหาวิทยาลัยในโอกาสครบรอบ 25 ปี..."></textarea>
+                    </div>
+                    
+                    <button type="submit" id="submitBtn" class="submit-btn">ส่งคำอวยพร ✨</button>
+                </form>
+            </div>
+            
+            <div class="stats">
+                <div class="stats-item">
+                    <strong id="totalMessages">0</strong>
+                    <div>ข้อความ</div>
+                </div>
+                <div class="stats-item">
+                    <strong id="uniqueWords">0</strong>
+                    <div>คำศัพท์</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="right-panel">
+            <div class="wordcloud-section">
+                <h2>🌟 Word Cloud คำอวยพร</h2>
+                <div class="wordcloud" id="wordcloud">
+                    <div class="empty-state">
+                        <span class="emoji">🎯</span>
+                        <p>รอคำอวยพรจากทุกคน...</p>
+                        <p style="margin-top: 10px; font-size: 0.9em; color: #94a3b8;">คำที่มีคนใช้บ่อยจะปรากฏใหญ่ขึ้น</p>
+                    </div>
+                </div>
+            </div>
+<div class="wordcloud-controls" id="wordcloudControls" style="display: none;">
+    <button id="showMoreBtn" class="show-more-btn">ดูเพิ่มเติม</button>
+    <button id="showLessBtn" class="show-more-btn" style="display: none;">ย่อ</button>
+</div>
+        </div>
+    </div>
+
+    <script>
+        // กำหนด API URL ตายตัว
+        const API_URL = 'https://nbu25th.northbkk.ac.th/firebase_proxy.php';
+        
+        class SimpleWordCloudApp {
+            
+constructor() {
+    this.messages = [];
+    this.wordFreq = new Map();
+    this.showingAll = false; // เพิ่มบรรทัดนี้
+    this.colors = [
+
+                    '#e11d48', '#dc2626', '#ea580c', '#d97706', '#ca8a04', '#65a30d', 
+                    '#16a34a', '#059669', '#0891b2', '#0284c7', '#2563eb', '#7c3aed',
+                    '#9333ea', '#c026d3', '#db2777', '#f59e0b', '#eab308', '#84cc16',
+                    '#22c55e', '#06b6d4', '#3b82f6', '#8b5cf6', '#a855f7', '#ec4899'
+                ];
+                this.init();
+            }
+            
+            init() {
+                console.log('🚀 Starting app with API URL:', API_URL);
+                this.setupEventListeners();
+                this.loadMessages();
+                setInterval(() => this.loadMessages(true), 10000); // Auto-refresh every 10 seconds
+            }
+            
+            
+setupEventListeners() {
+    document.getElementById('wishForm').addEventListener('submit', (e) => this.handleSubmit(e));
+    document.getElementById('showMoreBtn').addEventListener('click', () => this.showMoreWords());
+    document.getElementById('showLessBtn').addEventListener('click', () => this.showLessWords());
+}
+
+            
+            updateStatus(type, message) {
+                const status = document.getElementById('status');
+                status.className = `status ${type}`;
+                
+                if (type === 'connected') {
+                    // ซ่อนสถานะเมื่อเชื่อมต่อสำเร็จ
+                    status.style.display = 'none';
+                } else {
+                    status.style.display = 'block';
+                    if (type === 'loading') {
+                        status.innerHTML = message + '<span class="loading-dots"></span>';
+                    } else {
+                        status.textContent = message;
+                    }
+                }
+            }
+            
+            showMessage(type, text) {
+                const msgEl = document.getElementById(type + 'Msg');
+                msgEl.textContent = text;
+                msgEl.style.display = 'block';
+                
+                setTimeout(() => {
+                    msgEl.style.display = 'none';
+                }, 5000);
+            }
+            
+            async loadMessages(silent = false) {
+                if (!silent) this.updateStatus('loading', '🔄 กำลังโหลด');
+                
+                try {
+                    console.log('📡 Loading messages from:', API_URL + '?action=get');
+                    const response = await fetch(API_URL + '?action=get');
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.messages = data.messages || [];
+                        this.updateWordCloud();
+                        this.updateStats();
+                        
+                        if (!silent) this.updateStatus('connected', '🟢 เชื่อมต่อแล้ว');
+                    } else {
+                        throw new Error(data.error || 'Unknown error');
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ Load error:', error);
+                    if (!silent) {
+                        this.updateStatus('disconnected', '🔴 ไม่ได้เชื่อมต่อ');
+                        this.showMessage('error', 'ไม่สามารถโหลดข้อมูลได้: ' + error.message);
+                    }
+                }
+            }
+            
+            async handleSubmit(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('name').value.trim();
+                const message = document.getElementById('message').value.trim();
+                const submitBtn = document.getElementById('submitBtn');
+                
+                if (!message) {
+                    this.showMessage('error', 'กรุณาเขียนข้อความอวยพร');
+                    return;
+                }
+                
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '⏳ กำลังส่ง<span class="loading-dots"></span>';
+                
+                try {
+                    console.log('📤 Sending message to:', API_URL);
+                    
+                    const formData = new FormData();
+                    formData.append('action', 'add');
+                    formData.append('name', name || 'ไม่ระบุชื่อ');
+                    formData.append('message', message);
+                    
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        document.getElementById('wishForm').reset();
+                        this.showMessage('success', 'ส่งคำอวยพรสำเร็จแล้ว! 🎉');
+                        this.loadMessages();
+                    } else {
+                        throw new Error(data.error || 'Unknown error');
+                    }
+                    
+                } catch (error) {
+                    console.error('❌ Submit error:', error);
+                    this.showMessage('error', 'ไม่สามารถส่งข้อความได้: ' + error.message);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'ส่งคำอวยพร ✨';
+                }
+            }
+            
+            updateWordCloud() {
+                this.wordFreq.clear();
+                
+                this.messages.forEach(msg => {
+                    if (msg && msg.message) {
+                        const words = this.extractWords(msg.message);
+                        words.forEach(word => {
+                            if (word.length > 1 && !this.isStopWord(word)) {
+                                this.wordFreq.set(word, (this.wordFreq.get(word) || 0) + 1);
+                            }
+                        });
+                    }
+                });
+                
+                const container = document.getElementById('wordcloud');
+                const controls = document.getElementById('wordcloudControls');
+                
+                if (this.wordFreq.size === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <span class="emoji">🎯</span>
+                            <p>รอคำอวยพรจากทุกคน...</p>
+                            <p style="margin-top: 10px; font-size: 0.9em; color: #94a3b8;">คำที่มีคนใช้บ่อยจะปรากฏใหญ่ขึ้น</p>
+                        </div>
+                    `;
+                    controls.style.display = 'none';
+                    return;
+                }
+                
+                const sortedWords = Array.from(this.wordFreq.entries())
+                    .sort((a, b) => b[1] - a[1]);
+                
+                // กำหนดจำนวนคำที่จะแสดง
+                const displayCount = this.showingAll ? Math.min(sortedWords.length, 80) : Math.min(sortedWords.length, 30);
+                const wordsToDisplay = sortedWords.slice(0, displayCount);
+                
+                const maxFreq = Math.max(...wordsToDisplay.map(item => item[1]));
+                
+                container.innerHTML = '';
+                
+                wordsToDisplay.forEach(([word, freq], index) => {
+                    const wordEl = document.createElement('span');
+                    wordEl.className = 'word';
+                    wordEl.textContent = word;
+                    wordEl.title = `"${word}" ปรากฏ ${freq} ครั้ง`;
+                    
+                    // เพิ่มขนาดตัวอักษรขั้นต่ำเป็น 18px
+                    const fontSize = 18 + (freq / maxFreq) * 32;
+                    wordEl.style.fontSize = fontSize + 'px';
+                    wordEl.style.color = this.colors[index % this.colors.length];
+                    
+                    container.appendChild(wordEl);
+                });
+                
+                // แสดง/ซ่อนปุ่มควบคุม
+            
+// แสดง/ซ่อนปุ่มควบคุม
+if (controls && sortedWords.length > 30) {
+    controls.style.display = 'block';
+    const showMoreBtn = document.getElementById('showMoreBtn');
+    const showLessBtn = document.getElementById('showLessBtn');
+    
+    if (showMoreBtn) showMoreBtn.style.display = this.showingAll ? 'none' : 'inline-block';
+    if (showLessBtn) showLessBtn.style.display = this.showingAll ? 'inline-block' : 'none';
+} else if (controls) {
+    controls.style.display = 'none';
+}
+
+            }
+            
+            
+
+
+
+           showMoreWords() {
+                this.showingAll = true;
+                this.updateWordCloud();
+            }
+            
+            showLessWords() {
+                this.showingAll = false;
+                this.updateWordCloud();
+            }
+            
+            extractWords(text) {
+                if (!text) return [];
+                
+                const cleaned = text.replace(/[^\u0E00-\u0E7Fa-zA-Z0-9\s]/g, ' ');
+                const words = cleaned.split(/\s+/).filter(word => word.trim().length > 0);
+                
+                const result = [];
+                words.forEach(word => {
+                    if (/[\u0E00-\u0E7F]/.test(word) && word.length >= 2) {
+                        result.push(word.toLowerCase());
+                    } else if (/[a-zA-Z]/.test(word) && word.length >= 3) {
+                        result.push(word.toLowerCase());
+                    }
+                });
+                
+                return result;
+            }
+            
+            isStopWord(word) {
+                const stopWords = [
+                    'และ', 'ใน', 'ของ', 'ที่', 'จาก', 'เป็น', 'ได้', 'มี', 'ให้', 'จะ', 'ด้วย', 'นี้', 'นั้น', 'เพื่อ', 'ครับ', 'ค่ะ', 'คะ', 'กับ', 'ก็', 'ไม่', 'แล้ว', 'ยัง', 'อีก', 'แต่', 'หรือ', 'เมื่อ', 'ถ้า', 'ซึ่ง', 'ทำ', 'ใช้', 'เขา', 'เธอ', 'คุณ', 'การ', 'อยู่', 'มาก', 'ดี', 'ขอ', 'ให้',
+                    'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'a', 'an', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they'
+                ];
+                return stopWords.includes(word.toLowerCase());
+            }
+            
+            updateStats() {
+                document.getElementById('totalMessages').textContent = this.messages.length;
+                document.getElementById('uniqueWords').textContent = this.wordFreq.size;
+            }
+        }
+        
+        // เริ่มแอพเมื่อ DOM โหลดเสร็จ
+        document.addEventListener('DOMContentLoaded', () => {
+            window.app = new SimpleWordCloudApp();
+        });
+    </script>
+</body>
+</html>

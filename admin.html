@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - จัดการข้อความอวยพร</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #0ea5e9 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #1e3a8a;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .message-item {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .message-info {
+            flex: 1;
+        }
+
+        .sender-name {
+            font-weight: 600;
+            color: #1e3a8a;
+            font-size: 1.1em;
+        }
+
+        .timestamp {
+            color: #64748b;
+            font-size: 0.9em;
+            margin-top: 2px;
+        }
+
+        .message-content {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #3b82f6;
+            line-height: 1.6;
+        }
+
+        .message-id {
+            font-size: 0.8em;
+            color: #94a3b8;
+            font-family: monospace;
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+        }
+
+        .delete-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(22, 163, 74, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(22, 163, 74, 0.4);
+        }
+
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+            padding: 40px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+            padding: 40px;
+        }
+
+        .password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .password-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            margin: 15px 0;
+        }
+
+        .password-btn {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .stats {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .message-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="password-overlay" id="passwordOverlay">
+        <div class="password-box">
+            <h2>ใส่รหัสผ่าน Admin</h2>
+            <input type="password" id="passwordInput" class="password-input" placeholder="รหัสผ่าน">
+            <button onclick="checkPassword()" class="password-btn">เข้าสู่ระบบ</button>
+        </div>
+    </div>
+
+    <div class="container" id="mainContent" style="display: none;">
+        <div class="header">
+            <h1>🛠️ จัดการข้อความอวยพร</h1>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalMessages">0</div>
+                    <div>ข้อความทั้งหมด</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="loadTime">-</div>
+                    <div>อัพเดตล่าสุด</div>
+                </div>
+            </div>
+            <button onclick="loadMessages()" class="refresh-btn">🔄 รีเฟรช</button>
+        </div>
+
+        <div id="messagesList">
+            <div class="loading">🔄 กำลังโหลดข้อความ...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://nbu25th.northbkk.ac.th/firebase_proxy.php';
+        const ADMIN_PASSWORD = 'nbu25th_admin'; // เปลี่ยนรหัสผ่านตรงนี้
+
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById('passwordOverlay').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                loadMessages();
+            } else {
+                alert('รหัสผ่านไม่ถูกต้อง');
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        // กด Enter ในช่องรหัสผ่าน
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        async function loadMessages() {
+            const container = document.getElementById('messagesList');
+            container.innerHTML = '<div class="loading">🔄 กำลังโหลดข้อความ...</div>';
+
+            try {
+                const response = await fetch(API_URL + '?action=get');
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('totalMessages').textContent = data.messages.length;
+                    document.getElementById('loadTime').textContent = new Date().toLocaleTimeString('th-TH');
+
+                    if (data.messages.length === 0) {
+                        container.innerHTML = '<div class="empty-state">📭 ไม่มีข้อความ</div>';
+                        return;
+                    }
+
+                    container.innerHTML = '';
+                    data.messages.forEach(msg => {
+                        const div = document.createElement('div');
+                        div.className = 'message-item';
+                        div.id = `msg-${msg.id}`;
+                        
+                        const date = new Date(msg.timestamp);
+                        const formattedDate = date.toLocaleString('th-TH');
+                        
+                        div.innerHTML = `
+                            <div class="message-header">
+                                <div class="message-info">
+                                    <div class="sender-name">${msg.name}</div>
+                                    <div class="timestamp">${formattedDate}</div>
+                                </div>
+                                <button class="delete-btn" onclick="deleteMessage('${msg.id}')">🗑️ ลบ</button>
+                            </div>
+                            <div class="message-content">${msg.message}</div>
+                            <div class="message-id">ID: ${msg.id}</div>
+                        `;
+                        container.appendChild(div);
+                    });
+                } else {
+                    throw new Error(data.error || 'ไม่สามารถโหลดข้อมูลได้');
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                container.innerHTML = `<div class="empty-state">❌ เกิดข้อผิดพลาด: ${error.message}</div>`;
+            }
+        }
+
+        async function deleteMessage(id) {
+            if (!confirm('ต้องการลบข้อความนี้หรือไม่?\n\nการลบจะไม่สามารถกู้คืนได้')) {
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('action', 'delete');
+                formData.append('id', id);
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // ลบ element จากหน้าเว็บ
+                    const element = document.getElementById(`msg-${id}`);
+                    if (element) {
+                        element.style.opacity = '0.5';
+                        element.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            element.remove();
+                            // อัพเดตจำนวนข้อความ
+                            const currentTotal = parseInt(document.getElementById('totalMessages').textContent);
+                            document.getElementById('totalMessages').textContent = currentTotal - 1;
+                        }, 300);
+                    }
+                    
+                    alert('ลบข้อความสำเร็จ ✅');
+                } else {
+                    throw new Error(data.error || 'ไม่สามารถลบข้อความได้');
+                }
+            } catch (error) {
+                console.error('Error deleting message:', error);
+                alert('เกิดข้อผิดพลาดในการลบ: ' + error.message);
+            }
+        }
+
+        // Auto-refresh ทุก 30 วินาที
+        setInterval(() => {
+            if (document.getElementById('mainContent').style.display !== 'none') {
+                loadMessages();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
