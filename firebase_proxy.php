@@ -425,7 +425,7 @@ try {
                 ],
                 'timestamp' => date('c'),
                 'features' => [
-                    'rate_limiting' => 'Enhanced (50/hour)',
+                    'rate_limiting' => 'University NAT (1000/hour)',
                     'spam_detection' => true,
                     'profanity_filter' => true,
                     'captcha_validation' => true,
