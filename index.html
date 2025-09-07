@@ -730,7 +730,7 @@
             }
             
             init() {
-                console.log('🚀 Starting app with API URL:', API_URL);
+               // console.log('🚀 Starting app with API URL:', API_URL);
                 this.setupEventListeners();
                 this.generateCaptcha();
                 this.loadMessages();
@@ -779,7 +779,7 @@
                 // อัพเดตสถานะปุ่ม
                 this.updateSubmitButton();
                 
-                console.log('🔢 New captcha:', this.captcha.num1, '+', this.captcha.num2, '=', this.captcha.answer);
+            //    console.log('🔢 New captcha:', this.captcha.num1, '+', this.captcha.num2, '=', this.captcha.answer);
             }
             
             validateCaptcha() {
@@ -848,7 +848,7 @@
                 if (!silent) this.updateStatus('loading', '🔄 กำลังโหลด');
                 
                 try {
-                    console.log('📡 Loading messages from:', API_URL + '?action=get');
+                  //  console.log('📡 Loading messages from:', API_URL + '?action=get');
                     const response = await fetch(API_URL + '?action=get');
                     
                     if (!response.ok) {
@@ -900,7 +900,7 @@
                 submitBtn.innerHTML = '⏳ กำลังส่ง<span class="loading-dots"></span>';
                 
                 try {
-                    console.log('📤 Sending message to:', API_URL);
+                //    console.log('📤 Sending message to:', API_URL);
                     console.log('📝 Form data:', {
                         name: name || 'ไม่ระบุชื่อ',
                         messageLength: message.length,
