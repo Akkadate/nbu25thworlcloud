@@ -1,4 +1,53 @@
-<!DOCTYPE html>
+.status {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .connected { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .disconnected { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+        .loading { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .live-indicator {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: #ef4444;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: 600;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.5; }
+        }
+
+        /* Animation สำหรับการอัพเดตข้อมูล */
+        .wordcloud.updating {
+            animation: updatePulse 1s ease-in-out;
+        }
+
+        @keyframes updatePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
@@ -353,7 +402,20 @@
                 </div>
             </div>
             
-           
+            <div class="stats">
+                <div class="stats-item">
+                    <strong id="totalMessages">0</strong>
+                    <div>ข้อความทั้งหมด</div>
+                </div>
+                <div class="stats-item">
+                    <strong id="uniqueWords">0</strong>
+                    <div>คำศัพท์ที่พบ</div>
+                </div>
+                <div class="stats-item">
+                    <strong id="lastUpdated">-</strong>
+                    <div>อัพเดตล่าสุด</div>
+                </div>
+            </div>
         </div>
     </div>
 
