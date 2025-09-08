@@ -100,10 +100,13 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
             backdrop-filter: blur(15px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            height: 100%;
+            height: calc(100% - 10px); /* ลดความสูงเล็กน้อยเพื่อไม่ให้ชิดขอบ */
             display: flex;
             flex-direction: column;
         }
+        
+
+        
 
         .wordcloud-section h2 {
             color: #1e3a8a;
