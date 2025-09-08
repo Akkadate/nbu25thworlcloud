@@ -565,10 +565,7 @@
                 wordsToDisplay.forEach(([word, freq], index) => {
                     const wordEl = document.createElement('span');
                     wordEl.className = 'word word-appear';
-                    
-                    // ตัดคำที่ยาวเกินไป
-                    const displayWord = word.length > 12 ? word.substring(0, 12) + '...' : word;
-                    wordEl.textContent = displayWord;
+                    wordEl.textContent = word;
                     wordEl.title = `"${word}" ปรากฏ ${freq} ครั้ง`;
                     
                     // ปรับขนาดตัวอักษรให้เหมาะกับจอ LED แนวนอน (ลดขนาด)
