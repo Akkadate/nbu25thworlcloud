@@ -107,10 +107,10 @@
 
         .wordcloud-section h2 {
             color: #1e3a8a;
-            margin-bottom: 15px;
+            margin-bottom: 30px;
             font-size: 2.5em;
             text-align: center;
-            font-weight: 500;
+            font-weight: 600;
             border-bottom: 3px solid #3b82f6;
             padding-bottom: 15px;
         }
@@ -328,7 +328,17 @@
     <div class="status" id="status">🔄 กำลังโหลด<span class="loading-dots"></span></div>
     <div class="live-indicator">🔴 LIVE</div>
     
-  
+    <div class="header">
+        <div class="logo-container">
+            <div class="logo">
+                <img src="https://img5.pic.in.th/file/secure-sv1/Logo-NBU-Solid-Color-Blue-and-White--04_0.png" alt="University Logo">
+            </div>
+            <div class="header-content">
+                <h1>🎉 หนึ่งก้าวเล็กๆ ที่เราจะเริ่ม 🎉</h1>
+                <p>บทบาทของเราในการขับเคลื่อนมหาวิทยาลัย</p>
+            </div>
+        </div>
+    </div>
     
     <div class="main-container">
         <div class="wordcloud-panel">
@@ -468,8 +478,8 @@
                 const sortedWords = Array.from(this.wordFreq.entries())
                     .sort((a, b) => b[1] - a[1]);
                 
-                // แสดงสูงสุด 50 คำสำหรับ LED display
-                const displayCount = Math.min(sortedWords.length, 50);
+                // แสดงสูงสุด 60 คำสำหรับ LED display (เพิ่มขึ้นเพื่อใช้พื้นที่ให้เต็ม)
+                const displayCount = Math.min(sortedWords.length, 60);
                 const wordsToDisplay = sortedWords.slice(0, displayCount);
                 
                 const maxFreq = Math.max(...wordsToDisplay.map(item => item[1]));
@@ -483,14 +493,14 @@
                     wordEl.textContent = word;
                     wordEl.title = `"${word}" ปรากฏ ${freq} ครั้ง`;
                     
-                    // คำนวณขนาดตัวอักษรให้เหมาะสมกับหน้าจอใหญ่
+                    // คำนวณขนาดตัวอักษรให้เหมาะสมกับหน้าจอใหญ่ แต่ใช้พื้นที่ให้เต็ม
                     const frequencyRatio = (freq - minFreq) / (maxFreq - minFreq || 1);
-                    const fontSize = 24 + (frequencyRatio * 48); // 24px ถึง 72px
+                    const fontSize = 20 + (frequencyRatio * 40); // ลดขนาดจาก 24-72 เป็น 20-60
                     wordEl.style.fontSize = fontSize + 'px';
                     wordEl.style.color = this.colors[index % this.colors.length];
                     
                     // เพิ่ม delay animation
-                    wordEl.style.animationDelay = (index * 50) + 'ms';
+                    wordEl.style.animationDelay = (index * 30) + 'ms'; // ลด delay เพื่อให้ appear เร็วขึ้น
                     
                     container.appendChild(wordEl);
                 });
